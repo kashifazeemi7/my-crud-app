@@ -1,3 +1,16 @@
+//some jquery 
+$(document).ready(function(){
+	$('[data-toggle="tooltip"]').tooltip();
+	var actions = $("table td:last-child").html();
+
+});
+
+// Edit row on button click
+$(document).on("click", ".edit", function(){			
+    $(this).parents("tr").find(".add, .edit").toggle();
+   
+});
+
 // Displaying All Users on the table
 function getAllUsers() {
 
@@ -18,7 +31,7 @@ function getAllUsers() {
                         <td id="address-${eachUser._id}">${eachUser.address}</td>
                         <td>
           <a class="add" onclick="updateUser('${(eachUser._id)}')" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a>
-                        <a class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
+                        <a class="edit" id="('${(eachUser._id)}')" onclick="editUser('${eachUser._id}')" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
                         <a class="delete" onclick="deleteUser('${(eachUser._id)}')" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                     </td>
                     </tr>`
@@ -79,45 +92,39 @@ console.log(_id)
 }
 
 
-// Add row on add button click
-$(document).on("click", ".add", function(){
-    var empty = false;
-    var input = $(this).parents("tr").find('input[type="text"]');
-    input.each(function(){
-        if(!$(this).val()){
-            $(this).addClass("error");
-            empty = true;
-        } else{
-            $(this).removeClass("error");
-        }
-    });
-    $(this).parents("tr").find(".error").first().focus();
-    if(!empty){
-        input.each(function(){
-            $(this).parent("td").html($(this).val());
-        });			
-        $(this).parents("tr").find(".add, .edit").toggle();
-        $(".add-new").removeAttr("disabled");
-    }		
-});
+
 // Edit row on edit button click
-$(document).on("click", ".edit", function(){		
-    $(this).parents("tr").find("td:not(:last-child)").each(function(){
-        $(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
-    });		
-    $(this).parents("tr").find(".add, .edit").toggle();
-    $(".add-new").attr("disabled", "disabled");
-});
+function editUser(_id) {
+    // let editClick = document.getElementById(`"${_id}"`)
+    // editClick.style.display = "none";
+
+    let inputName = document.getElementById(`name-${_id}`).innerText;
+    let inputEmail = document.getElementById(`email-${_id}`).innerText;
+    let inputAddress = document.getElementById(`address-${_id}`).innerText;
+    
+    let current_data = []
+    current_data.push(inputName,inputEmail,inputAddress)
+    console.log(current_data)
+    
+    // let assets = ["name","email","address"]
+    document.getElementById(`name-${_id}`).innerHTML = '<input id="' + `in-name-${_id}` + '"' + 'value="' + inputName +  '" >'
+    document.getElementById(`email-${_id}`).innerHTML = '<input id="' + `in-email-${_id}` + '"' + 'value="' + inputEmail +  '" >'
+    document.getElementById(`address-${_id}`).innerHTML = '<input id="' + `in-address-${_id}` + '"' + 'value="' + inputAddress +  '" >'
+}
+
+
+
+
 // Delete row on delete button click
 $(document).on("click", ".delete", function(){
     $(this).parents("tr").remove();
-    $(".add-new").removeAttr("disabled");
 });
 
 function updateUser(_id) {
-    let name = document.getElementById(`name-${_id}`).value
-    let email = document.getElementById(`email-${_id}`).value
-    let address = document.getElementById(`address-${_id}`).value
+    
+    let name = document.getElementById(`in-name-${_id}`).value
+    let email = document.getElementById(`in-email-${_id}`).value
+    let address = document.getElementById(`in-address-${_id}`).value
 console.log(name,email,address)
     axios.put(`https://server-crudapp-mongodb.herokuapp.com/user/${_id}`, { name, email, address })
         .then(function (response) {
@@ -131,7 +138,7 @@ console.log(name,email,address)
                 </div>`
 
             setTimeout(() => {
-                document.getElementById("alert").innerHTML = ""
+                document.getElementById("alert").innerHTML = "" 
             }, 1500);
 
         })
